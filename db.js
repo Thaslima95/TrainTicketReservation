@@ -86,157 +86,146 @@ connection.connect((err) => {
 
 
 
-book('MC808','Thaslima','M')
+book('MC808', 'Thaslima', 'M')
 
-function book(TrainId,Name,Berth)
-{
+function book(TrainId, Name, Berth) {
   console.log(Berth)
-  const sq1=`SELECT seatNumber FROM SEATS WHERE Berth='${Berth}' && status='AVAILABLE' LIMIT 1`
-  connection.query(sq1,(err,result)=>{
-    if(err) throw err;
-    if(result.length>0)
-    {
-        seatNumber=result[0].seatNumber;
-     const sql=`INSERT INTO PassengerDetails (TrainId,SeatNumber,PassengerName,Berth) VALUES ('${TrainId}',CONCAT('S',${result[0].seatNumber}),'${Name}','${Berth}')`
-connection.query(sql,(err,result)=>{
-  if(err) throw err;
-  
-  connection.query(`UPDATE SEATS SET status='BOOKED' WHERE seatNumber=${seatNumber} `,(err,result)=>{
-    if(err) throw err;
-    console.log("Ticket Booked")
-  })
-})
+  const sq1 = `SELECT seatNumber FROM SEATS WHERE Berth='${Berth}' && status='AVAILABLE' LIMIT 1`
+  connection.query(sq1, (err, result) => {
+    if (err) throw err;
+    if (result.length > 0) {
+      seatNumber = result[0].seatNumber;
+      const sql = `INSERT INTO PassengerDetails (TrainId,SeatNumber,PassengerName,Berth) VALUES ('${TrainId}',CONCAT('S',${result[0].seatNumber}),'${Name}','${Berth}')`
+      connection.query(sql, (err, result) => {
+        if (err) throw err;
+
+        connection.query(`UPDATE SEATS SET status='BOOKED' WHERE seatNumber=${seatNumber} `, (err, result) => {
+          if (err) throw err;
+          console.log("Ticket Booked")
+        })
+      })
     }
-    else{
-      const sql=`SELECT * FROM SEATS WHERE Berth IN ('L','M','U')  && Status='AVAILABLE' LIMIT 1`
-      connection.query(sql,(err,result)=>{
-        if(err) throw err;
-       
-        if(result.length>0)
-        {
-             if((Berth=='L'|| Berth=='U')&& (result[0].Berth=='M'))
-      {
-        Berth='M';
-        
-       return insertT(TrainId,Name,Berth)
-       
-      }
-      else if((Berth=='L'|| Berth=='M' )&& (result[0].Berth=='U'))
-      {
-        Berth='U';
-        
-        return insertT(TrainId,Name,Berth)
-      }
-      else if((Berth=='M'|| Berth=='U')&& (result[0].Berth=='L'))
-      {
-        Berth='L';
-        
-        return insertT(TrainId,Name,Berth)
-        
-      }
+    else {
+      const sql = `SELECT * FROM SEATS WHERE Berth IN ('L','M','U')  && Status='AVAILABLE' LIMIT 1`
+      connection.query(sql, (err, result) => {
+        if (err) throw err;
+
+        if (result.length > 0) {
+          if ((Berth == 'L' || Berth == 'U') && (result[0].Berth == 'M')) {
+            Berth = 'M';
+
+            return book(TrainId, Name, Berth)
+
+          }
+          else if ((Berth == 'L' || Berth == 'M') && (result[0].Berth == 'U')) {
+            Berth = 'U';
+
+            return book(TrainId, Name, Berth)
+          }
+          else if ((Berth == 'M' || Berth == 'U') && (result[0].Berth == 'L')) {
+            Berth = 'L';
+
+            return book(TrainId, Name, Berth)
+
+          }
         }
-        else{
-          const sql=`SELECT * FROM SEATS WHERE Berth='RAC' && status='AVAILABLE' LIMIT 1`
-          connection.query(sql,(err,result)=>{
-            if(err) throw err;
-            if(result.length>0)
-            {
-              seatNumber=result[0].seatNumber;
-             const sql=`INSERT INTO PassengerDetails (TrainId,SeatNumber,PassengerName,BERTH) VALUES ('${TrainId}',CONCAT('S',${result[0].seatNumber}),'${Name}','${result[0].Berth}') `
-             connection.query(sql,(err,result)=>{
-              if(err) throw err;
-              connection.query(`UPDATE SEATS SET status='BOOKED' WHERE seatNumber=${seatNumber} `,(err,result)=>{
-                if(err) throw err;
-                console.log("Ticket Booked with RAC")
+        else {
+          const sql = `SELECT * FROM SEATS WHERE Berth='RAC' && status='AVAILABLE' LIMIT 1`
+          connection.query(sql, (err, result) => {
+            if (err) throw err;
+            if (result.length > 0) {
+              seatNumber = result[0].seatNumber;
+              const sql = `INSERT INTO PassengerDetails (TrainId,SeatNumber,PassengerName,BERTH) VALUES ('${TrainId}',CONCAT('S',${result[0].seatNumber}),'${Name}','${result[0].Berth}') `
+              connection.query(sql, (err, result) => {
+                if (err) throw err;
+                connection.query(`UPDATE SEATS SET status='BOOKED' WHERE seatNumber=${seatNumber} `, (err, result) => {
+                  if (err) throw err;
+                  console.log("Ticket Booked with RAC")
+                })
               })
-             })
             }
-            else{
-                 const sql=`SELECT * FROM SEATS WHERE Berth='WL' && status='AVAILABLE' LIMIT 1`
-                 connection.query(sql,(err,result)=>{
-                  if(err) throw err;
-                  if(result.length>0)
-                  {
-                    id=result[0].id
-                    const sql=`INSERT INTO PassengerDetails (TrainId,PassengerName,BERTH) VALUES ('${TrainId}','${Name}','WL')`
-                    connection.query(sql,(err,result)=>{
-                      if(err) throw err;
-                      connection.query(`UPDATE SEATS SET status='BOOKED' WHERE id=${id}`,(err,result)=>{
-                        if(err) throw err;
-                        console.log("You are in Waiting List")
-                      })
+            else {
+              const sql = `SELECT * FROM SEATS WHERE Berth='WL' && status='AVAILABLE' LIMIT 1`
+              connection.query(sql, (err, result) => {
+                if (err) throw err;
+                if (result.length > 0) {
+                  id = result[0].id
+                  const sql = `INSERT INTO PassengerDetails (TrainId,PassengerName,BERTH) VALUES ('${TrainId}','${Name}','WL')`
+                  connection.query(sql, (err, result) => {
+                    if (err) throw err;
+                    connection.query(`UPDATE SEATS SET status='BOOKED' WHERE id=${id}`, (err, result) => {
+                      if (err) throw err;
+                      console.log("You are in Waiting List")
                     })
-                  }
-                  else{
-                    console.log('No Tickets Available')
-                  }
-                 })
+                  })
+                }
+                else {
+                  console.log('No Tickets Available')
+                }
+              })
             }
           })
         }
       })
     }
   })
- 
+
 }
 
 
-function cancel(TrainId,Name,seatNumber)
-{
-  let seatNumber1=seatNumber;
-  const sql1=`SELECT BERTH FROM PassengerDetails WHERE PassengerName='${Name}' && seatNumber='${seatNumber}'`
-  connection.query(sql1,(err,result)=>{
-    if(err) throw err;
-    let berth=result[0].BERTH;
-      const sql=`DELETE FROM PassengerDetails WHERE PassengerName='${Name}' && seatNumber='${seatNumber}'`
-  connection.query(sql,(err,result)=>{
-    if(err) throw err;
-    console.log("Cancelled sucess")
-    connection.query(`UPDATE SEATS SET status='AVAILABLE' WHERE seatNumber='${seatNumber.substring(1)}'`,(err,result)=>{
-      if(err) throw err;
-      const sql=`SELECT * FROM PassengerDetails WHERE BERTH='RAC' LIMIT 1`
-      connection.query(sql,(err,result)=>{
-        if(err) throw err;
-        if(result.length>0)
-        {
-          console.log(result)
-          TrainId=result[0].TrainId;
-          Name=result[0].PassengerName;
-          seatNumber=result[0].SeatNumber;
-          
-          const sql=`UPDATE PassengerDetails SET seatNumber='${seatNumber1}',BERTH='${berth}' WHERE id=${result[0].id}`
-          connection.query(sql,(err,result)=>{
-            if(err) throw err;
-            connection.query(`UPDATE SEATS SET status='BOOKED' WHERE seatNumber='${seatNumber1.substring(1)}'`,(err,result)=>{
-              if(err) throw err;
-              const sql=`SELECT * FROM PassengerDetails WHERE BERTH='WL' LIMIT 1`
-              connection.query(sql,(err,result)=>{
-                if(err) throw err;
-                if(result.length>0)
-                {
-                  TrainId=result[0].TrainId;
-                  Name=result[0].PassengerName;
-                  id=result[0].id;
-                  console.log(result)
-                  connection.query(`UPDATE PassengerDetails SET seatNumber='${seatNumber}',BERTH='RAC' WHERE id=${id}`,(err,result)=>{
-                    if(err) throw err;
-                   connection.query(`UPDATE SEATS SET status='BOOKED' WHERE seatNumber='${seatNumber.substring(1)}'`,(err,result)=>{
-                if(err) throw err;
-                connection.query(`UPDATE SEATS SET status='AVAILABLE' WHERE id=(SELECT id FROM (SELECT min(id) as id FROM SEATS AS s WHERE Berth='WL') AS tmp)`,(err,result)=>{
-                  if(err) throw err;
-                  console.log(result)
+function cancel(TrainId, Name, seatNumber) {
+  let seatNumber1 = seatNumber;
+  const sql1 = `SELECT BERTH FROM PassengerDetails WHERE PassengerName='${Name}' && seatNumber='${seatNumber}'`
+  connection.query(sql1, (err, result) => {
+    if (err) throw err;
+    let berth = result[0].BERTH;
+    const sql = `DELETE FROM PassengerDetails WHERE PassengerName='${Name}' && seatNumber='${seatNumber}'`
+    connection.query(sql, (err, result) => {
+      if (err) throw err;
+      console.log("Cancelled sucess")
+      connection.query(`UPDATE SEATS SET status='AVAILABLE' WHERE seatNumber='${seatNumber.substring(1)}'`, (err, result) => {
+        if (err) throw err;
+        const sql = `SELECT * FROM PassengerDetails WHERE BERTH='RAC' LIMIT 1`
+        connection.query(sql, (err, result) => {
+          if (err) throw err;
+          if (result.length > 0) {
+            console.log(result)
+            TrainId = result[0].TrainId;
+            Name = result[0].PassengerName;
+            seatNumber = result[0].SeatNumber;
+
+            const sql = `UPDATE PassengerDetails SET seatNumber='${seatNumber1}',BERTH='${berth}' WHERE id=${result[0].id}`
+            connection.query(sql, (err, result) => {
+              if (err) throw err;
+              connection.query(`UPDATE SEATS SET status='BOOKED' WHERE seatNumber='${seatNumber1.substring(1)}'`, (err, result) => {
+                if (err) throw err;
+                const sql = `SELECT * FROM PassengerDetails WHERE BERTH='WL' LIMIT 1`
+                connection.query(sql, (err, result) => {
+                  if (err) throw err;
+                  if (result.length > 0) {
+                    TrainId = result[0].TrainId;
+                    Name = result[0].PassengerName;
+                    id = result[0].id;
+                    console.log(result)
+                    connection.query(`UPDATE PassengerDetails SET seatNumber='${seatNumber}',BERTH='RAC' WHERE id=${id}`, (err, result) => {
+                      if (err) throw err;
+                      connection.query(`UPDATE SEATS SET status='BOOKED' WHERE seatNumber='${seatNumber.substring(1)}'`, (err, result) => {
+                        if (err) throw err;
+                        connection.query(`UPDATE SEATS SET status='AVAILABLE' WHERE id=(SELECT id FROM (SELECT min(id) as id FROM SEATS AS s WHERE Berth='WL') AS tmp)`, (err, result) => {
+                          if (err) throw err;
+                          console.log(result)
+                        })
+                      })
+                    })
+                  }
                 })
+
               })
-                  })
-                }
-              })
-              
             })
-          })
-        }
+          }
+        })
       })
     })
-  })
   })
 
 }
@@ -248,7 +237,7 @@ function cancel(TrainId,Name,seatNumber)
 
 
 //Drop Table
-// 
+//
 
 
 // const sql=`DROP TABLE PassengerDetails`
